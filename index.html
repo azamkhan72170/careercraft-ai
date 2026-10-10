@@ -28,7 +28,35 @@
 <section class="section" id="features"><div class="sectionhead"><span class="eyebrow">BUILT FOR YOUR NEXT STEP</span><h2>More clarity. Less guesswork.</h2><p>Simple tools to help you move from learning to doing.</p></div><div class="features"><article class="feature"><div class="icon">🧾</div><h3>Resume draft builder</h3><p>Turn your education, skills and projects into a structured first resume draft.</p></article><article class="feature"><div class="icon">🧭</div><h3>Career path suggestions</h3><p>Explore entry-level roles matched to the skills and interests you enter.</p></article><article class="feature"><div class="icon">🚀</div><h3>Actionable skill roadmap</h3><p>Get practical next steps to keep learning and building portfolio projects.</p></article></div></section>
 <section class="section" id="studio"><div class="sectionhead"><span class="eyebrow">YOUR PERSONAL WORKSPACE</span><h2>Build your career plan</h2><p>Create a polished, recruiter-friendly resume draft and get practical career suggestions.</p></div><main class="workspace"><section class="panel formpanel"><div class="panelhead"><div class="icon">👤</div><div><h2>Your profile</h2><p>Share the basics to get started.</p></div></div><form id="profile"><div class="formgrid"><div class="field"><label for="name">Full name *</label><input id="name" required placeholder="e.g. Alex Sharma"></div><div class="field"><label for="email">Email</label><input id="email" type="email" placeholder="alex@email.com"></div><div class="field"><label for="education">Education *</label><input id="education" required placeholder="e.g. BCA student"></div><div class="field"><label for="phone">Phone</label><input id="phone" type="tel" placeholder="e.g. +91 98765 43210"></div><div class="field"><label for="location">City / Location</label><input id="location" placeholder="e.g. Delhi NCR"></div><div class="field"><label for="linkedin">LinkedIn URL</label><input id="linkedin" type="url" placeholder="https://linkedin.com/in/yourname"></div><div class="field"><label for="github">GitHub / Portfolio URL</label><input id="github" type="url" placeholder="https://github.com/yourname"></div><div class="field full"><label for="skills">Skills (comma separated) *</label><textarea id="skills" required placeholder="Excel, Python, SQL, communication"></textarea></div><div class="field full"><label for="interests">Career interests</label><input id="interests" placeholder="e.g. data analytics, web development"></div><div class="field full"><label for="experience">Projects (name, what you built, tools used)</label><textarea id="experience" placeholder="Student Performance Dashboard — analysed marks using Excel and Power BI; created charts to highlight trends."></textarea></div><div class="field full"><label for="certifications">Certifications / achievements</label><textarea id="certifications" placeholder="e.g. Python Fundamentals — IBM SkillsBuild (2026)"></textarea></div></div><div class="actions"><button class="btn small" type="submit">Generate my plan ✨</button><button class="btn secondary small" type="reset">Clear form</button></div><div class="notice">🔒 Demo privacy: your details are processed in this browser and are not sent to a server. Recommendations use simple rule-based matching; this is an educational prototype, not a hiring guarantee.</div></form></section>
 <section class="panel"><div class="panelhead"><div class="icon">📊</div><div><h2>Your career report</h2><p class="muted">Your resume and recommendations will appear here.</p></div></div><div id="output" class="report"><div class="placeholder">✨ Complete your profile and select <strong>“Generate my plan”</strong> to see your career report here.</div></div></section></main></section><footer class="footer"><span>✦ CareerCraft AI · Student Project Prototype</span><span>SDG 8: Decent Work & Economic Growth</span></footer></div>
-<script>
+
+<section class="section" id="job-matcher">
+  <div class="sectionhead">
+    <span class="eyebrow">CAREER TOOL</span>
+    <h2>Job Description Matcher</h2>
+    <p>Compare your skills with a job and discover what to learn next.</p>
+  </div>
+
+  <div class="panel" style="padding:20px">
+    <label for="mySkills">Your skills</label>
+    <textarea id="mySkills" rows="4"
+      placeholder="Example: Python, SQL, Excel, Power BI"
+      style="width:100%;box-sizing:border-box;padding:12px;margin:8px 0 16px;border-radius:8px;border:1px solid #64748b;background:#111a2d;color:#fff"></textarea>
+
+    <label for="jobDescription">Job description</label>
+    <textarea id="jobDescription" rows="6"
+      placeholder="Paste the company's job description here..."
+      style="width:100%;box-sizing:border-box;padding:12px;margin:8px 0 16px;border-radius:8px;border:1px solid #64748b;background:#111a2d;color:#fff"></textarea>
+
+    <button type="button" id="matchJob"
+      style="padding:12px 18px;border:0;border-radius:8px;background:#4f8cff;color:white;font-weight:bold">
+      Analyze Job Match
+    </button>
+
+    <div id="jobMatchResult" aria-live="polite" style="margin-top:18px"></div>
+  </div>
+</section>
+ 
+ <script>
 const $=id=>document.getElementById(id);
 const roles=[
 {name:"Data Analyst",keys:["excel","sql","python","power bi","tableau","statistics","data","pandas"],learn:["Practice SQL queries, filtering and joins","Build an Excel or Power BI dashboard","Practise data cleaning and basic statistics","Publish one end-to-end analysis project"]},
@@ -54,4 +82,48 @@ $("profile").addEventListener("submit",e=>{
  $("print").addEventListener("click",()=>window.print());
 });
 $("profile").addEventListener("reset",()=>setTimeout(()=>{$("output").innerHTML='<div class="placeholder">✨ Complete your profile and select <strong>“Generate my plan”</strong> to see your career report here.</div>'},0));
-</script></body></html>
+
+document.getElementById("matchJob").addEventListener("click", () => {
+  const skillsInput = document.getElementById("mySkills").value.toLowerCase();
+  const jobText = document.getElementById("jobDescription").value.toLowerCase();
+  const result = document.getElementById("jobMatchResult");
+
+  if (!skillsInput.trim() || !jobText.trim()) {
+    result.innerHTML = "<p>Please enter your skills and the job description.</p>";
+    return;
+  }
+
+  const knownSkills = [
+    "python", "sql", "excel", "power bi", "tableau",
+    "javascript", "html", "css", "react", "java",
+    "c++", "c", "pandas", "numpy", "statistics",
+    "machine learning", "data analysis", "communication",
+    "problem solving", "git", "github", "aws", "django"
+  ];
+
+  const required = knownSkills.filter(skill => {
+    const escaped = skill.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp("\\b" + escaped + "\\b", "i").test(jobText);
+  });
+
+  const matched = required.filter(skill => {
+    const escaped = skill.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp("\\b" + escaped + "\\b", "i").test(skillsInput);
+  });
+
+  const missing = required.filter(skill => !matched.includes(skill));
+  const percentage = required.length
+    ? Math.round((matched.length / required.length) * 100)
+    : 0;
+
+  result.innerHTML = `
+    <h3>Skill Match: ${percentage}%</h3>
+    <p><strong>Matched skills:</strong> ${matched.length ? matched.join(", ") : "None found"}</p>
+    <p><strong>Skills to learn:</strong> ${missing.length ? missing.join(", ") : "No missing skills found in our supported list"}</p>
+    <p style="font-size:12px;color:#a8b3cb">
+      This estimate checks supported skill keywords only. It does not assess your actual proficiency.
+    </p>
+  `;
+});
+  
+ </script></body></html>
